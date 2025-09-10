@@ -30,5 +30,5 @@ class GraphBuilder():
 
 
     def __call__(self):
-        pass
+        return self.build_graph()
 
