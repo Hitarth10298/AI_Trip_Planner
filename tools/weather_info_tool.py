@@ -15,6 +15,7 @@ class WeatherInfoTool:
         """Setup all tools for the weather forecast tool"""
         @tool
         def get_current_weather(city: str):
+            """Get current weather for a city"""
             weather_data = self.weather_service.get_current_weather(city)
             if weather_data:
                 temp = weather_data.get('main', {}).get('temp', 'N/A')
