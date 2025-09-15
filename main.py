@@ -20,11 +20,14 @@ app.add_middleware(
 )
 
 class QueryRequest(BaseModel):
-    query: str
+    question: str
 
 @app.post("/query")
 
 async def query_travel_agent(query: QueryRequest):
+    """
+    Handle a travel query, build a graph, and return an AI-generated response.
+    """
     try:
         print(query)
         graph = GraphBuilder(model_provider="groq")
