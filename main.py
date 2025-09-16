@@ -25,7 +25,6 @@ class QueryRequest(BaseModel):
     question: str
 
 @app.post("/query")
-
 async def query_travel_agent(query: QueryRequest):
     """
     Handle a travel query, build a graph, and return an AI-generated response.
@@ -34,29 +33,22 @@ async def query_travel_agent(query: QueryRequest):
         print(query)
         graph = GraphBuilder(model_provider="groq")
         react_app=graph()
-
+        #react_app = graph.build_graph()
 
         png_graph = react_app.get_graph().draw_mermaid_png()
         with open("my_graph.png", "wb") as f:
             f.write(png_graph)
 
         print(f"Graph saved as 'my_graph.png' in {os.getcwd()}")
-
-        messages={"messages": HumanMessage(content=query.question)}
+        # Assuming request is a pydantic object like: {"question": "your text"}
+        messages={"messages": [query.question]}
         output = react_app.invoke(messages)
 
-
-        if (
-            isinstance(output, dict)
-            and "messages" in output
-            and output["messages"]
-            ):
-                
-                last_msg = output["messages"][-1]
-    # check if last_msg has attribute 'content'
-                final_output = getattr(last_msg, "content", str(last_msg))
+        # If result is dict with messages:
+        if isinstance(output, dict) and "messages" in output:
+            final_output = output["messages"][-1].content  # Last AI response
         else:
-            final_output = "No response from bot."
+            final_output = str(output)
         
         return {"answer": final_output}
     except Exception as e:
