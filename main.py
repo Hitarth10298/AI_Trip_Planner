@@ -25,7 +25,9 @@ class QueryRequest(BaseModel):
 @app.post("/query")
 
 async def query_travel_agent(query: QueryRequest):
-   
+    """
+    Handle a travel query, build a graph, and return an AI-generated response.
+    """
     try:
         print(query)
         graph = GraphBuilder(model_provider="groq")

@@ -27,6 +27,9 @@ class ModelLoader(BaseModel):
         arbitrary_types_allowed = True
     
     def load_llm(self):
+        """
+        Load and return the LLM model.
+        """
         print("LLM Loading...")
         print(f"Loading model from provider: {self.model_provider}")
         if self.model_provider == "groq":
