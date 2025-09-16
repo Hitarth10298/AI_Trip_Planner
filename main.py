@@ -7,6 +7,8 @@ import os
 import datetime
 from dotenv import load_dotenv
 from pydantic import BaseModel
+from langchain.schema import HumanMessage
+
 load_dotenv()
 
 app = FastAPI()
@@ -40,14 +42,21 @@ async def query_travel_agent(query: QueryRequest):
 
         print(f"Graph saved as 'my_graph.png' in {os.getcwd()}")
 
-        messages={"messages": [query.question]}
+        messages={"messages": HumanMessage(content=query.question)}
         output = react_app.invoke(messages)
 
 
-        if isinstance(output, dict) and "messages" in output:
-            final_output = output["messages"][-1].content  
+        if (
+            isinstance(output, dict)
+            and "messages" in output
+            and output["messages"]
+            ):
+                
+                last_msg = output["messages"][-1]
+    # check if last_msg has attribute 'content'
+                final_output = getattr(last_msg, "content", str(last_msg))
         else:
-            final_output = str(output)
+            final_output = "No response from bot."
         
         return {"answer": final_output}
     except Exception as e:
