@@ -14,7 +14,7 @@ class ConfigLoader:
         self.config = load_config()
     
     def __getitem__(self, key):
-        return self.config.get(key)
+        return self.config[key]
 
 class ModelLoader(BaseModel):
     model_provider: Literal["groq", "openai"] = "groq"
