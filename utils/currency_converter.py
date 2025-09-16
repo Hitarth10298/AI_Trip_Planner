@@ -6,7 +6,7 @@ class CurrencyConverter:
     
 
     def convert(self, from_currency: str, to_currency: str, amount: float) -> float:
-        url = f"{self.base_url}{from_currency}"
+        url = f"{self.base_url}/{from_currency}"
         response = requests.get(url)
         if response.status_code != 200:
             raise Exception("API call failed: ", response.json())
