@@ -24,34 +24,38 @@ app.add_middleware(
 class QueryRequest(BaseModel):
     question: str
 
+from langchain.schema import HumanMessage
+
 @app.post("/query")
 async def query_travel_agent(query: QueryRequest):
-    """
-    Handle a travel query, build a graph, and return an AI-generated response.
-    """
     try:
-        print(query)
-        graph = GraphBuilder(model_provider="groq")
-        react_app=graph()
-        #react_app = graph.build_graph()
+        print(f"Received query: {query.question}")
 
-        png_graph = react_app.get_graph().draw_mermaid_png()
-        with open("my_graph.png", "wb") as f:
-            f.write(png_graph)
+        graph = GraphBuilder(model_provider="groq")()
 
-        print(f"Graph saved as 'my_graph.png' in {os.getcwd()}")
-        # Assuming request is a pydantic object like: {"question": "your text"}
-        messages={"messages": [query.question]}
-        output = react_app.invoke(messages)
+        messages = {"messages": [HumanMessage(content=query.query)]}
+        print("Messages sent to graph:", messages)
 
-        # If result is dict with messages:
-        if isinstance(output, dict) and "messages" in output:
-            final_output = output["messages"][-1].content  # Last AI response
+        output = graph.invoke(messages)
+        print("Graph raw output:", output)
+
+        # SAFE GUARD
+        if (
+            isinstance(output, dict)
+            and "messages" in output
+            and output["messages"]
+        ):
+            last_msg = output["messages"][-1]
+            final_output = getattr(last_msg, "content", str(last_msg))
         else:
-            final_output = str(output)
-        
+            final_output = "⚠️ Bot did not return any messages."
+
         return {"answer": final_output}
+
     except Exception as e:
+        import traceback
+        print("Error:", traceback.format_exc())
         return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 
